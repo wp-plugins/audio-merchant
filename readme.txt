@@ -42,7 +42,6 @@ Sell or showcase your audio directly to your listeners with this versatile HTML5
 * Fits in any size restrictions with resizable HTML5 player! Responsive layout!
 * Mobile friendly! Works with all mobile devices!
 * Tested & works with all major web browsers like Internet Explorer, Google Chrome, Firefox, Safari, and Opera!
-* One-time fee only! Plugin runs on your own website!
 * Easy installation! Simply install the plugin onto your WordPress website & begin selling/showcasing your audio files right away!
 * and much more!
 

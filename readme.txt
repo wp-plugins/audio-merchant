@@ -21,7 +21,7 @@ Sell or showcase your audio directly to your listeners with this versatile HTML5
 * Multiple pricing formats! You can sell your audio lease, exclusive, one-time download fee or give them away for free download, it’s up to you! Perfect for artists, producers and musicians!
 * Supports multiple currencies!
 * Supports multiple languages! Translation ready!
-* Sleek HTML5 player built-in to allow you to sell or showcase your audio!
+* Versatile HTML5 player built-in to allow you to sell or showcase your audio!
 * Customizable look! Use CSS and HTML to customize the HTML5 player to your needs!
 * Playlist support! Create & share different playlist for your audio!
 * Multiple HTML5 players on a page!

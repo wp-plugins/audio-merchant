@@ -1707,20 +1707,26 @@ function audio_merchant_get_audio_file_duration($audioFilePath, $inSeconds=true)
 
 function audio_merchant_get_locale_currency_symbol($locale, $currency)
 {
-    // Create a NumberFormatter
-    $formatter = new NumberFormatter($locale, NumberFormatter::CURRENCY);
+	if(class_exists('NumberFormatter'))
+	{
+		// Create a NumberFormatter
+		$formatter = new NumberFormatter($locale, NumberFormatter::CURRENCY);
 
-    // Figure out what 0.00 looks like with the currency symbol
-    $withCurrency = $formatter->formatCurrency(0, $currency);
+		// Figure out what 0.00 looks like with the currency symbol
+		$withCurrency = $formatter->formatCurrency(0, $currency);
 
-    // Figure out what 0.00 looks like without the currency symbol
-    $formatter->setPattern(str_replace('¤', '', $formatter->getPattern()));
-    $withoutCurrency = $formatter->formatCurrency(0, $currency);
+		// Figure out what 0.00 looks like without the currency symbol
+		$formatter->setPattern(str_replace('¤', '', $formatter->getPattern()));
+		$withoutCurrency = $formatter->formatCurrency(0, $currency);
 
-    // Extract just the currency symbol from the first string
-    return str_replace($withoutCurrency, '', $withCurrency);    
+		// Extract just the currency symbol from the first string
+		return str_replace($withoutCurrency, '', $withCurrency);
+	}
+    else 
+	{
+		return '';
+	}
 }
-
 
 function audio_merchant_get_setting($settingName)
 {

@@ -1801,7 +1801,7 @@ function audio_merchant_render_player($audioIds=array(), $playerId=0, $height=40
 		
 		if(empty($authorLink))
 		{
-			$sponsoredLinks = array('<a href="http://www.myaudiomerchant.com/">Audio Player</a>', '<a href="http://www.myaudiomerchant.com/">HTML5 Audio Player</a>', '<a href="http://www.myaudiomerchant.com/">Sell Audio</a>', '<a href="http://www.persianmobproductions.com/">Beats</a>', '<a href="http://www.persianmobproductions.com/">Rap Instrumentals</a>', '<a href="http://www.persianmobproductions.com/">Rap Beats</a>', '<a href="http://www.persianmobproductions.com/">Hip Hop Instrumentals</a>', '<a href="http://www.persianmobproductions.com/">Hip Hop Beats</a>', '<a href="http://www.persianmobproductions.com/">Buy Rap Beats</a>', '<a href="http://www.persianmobproductions.com/">Industry-Ready Rap Beats</a>');
+			$sponsoredLinks = array('<a href="http://www.myaudiomerchant.com/">Audio Player</a>', '<a href="http://www.myaudiomerchant.com/">HTML5 Audio Player</a>', '<a href="http://www.myaudiomerchant.com/">Sell Audio</a>', '<a href="http://www.myaudiomerchant.com/">Sell Music</a>', '<a href="http://www.persianmobproductions.com/">Beats</a>', '<a href="http://www.persianmobproductions.com/">Rap Instrumentals</a>', '<a href="http://www.persianmobproductions.com/">Rap Beats</a>', '<a href="http://www.persianmobproductions.com/">Hip Hop Instrumentals</a>', '<a href="http://www.persianmobproductions.com/">Hip Hop Beats</a>', '<a href="http://www.persianmobproductions.com/">Buy Rap Beats</a>', '<a href="http://www.persianmobproductions.com/">Industry-Ready Rap Beats</a>');
 			
 			$authorLink = $sponsoredLinks[array_rand($sponsoredLinks, 1)];
 			

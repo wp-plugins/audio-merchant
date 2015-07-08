@@ -1,7 +1,7 @@
 === Audio Merchant ===
 Contributors: AudioMerchant
 Donate link: http://www.myaudiomerchant.com/#download
-Tags: sell audio, audio player, html5 audio player, html audio player, audioplayer, radio, mp3, play, listen, music, ogg, producer, artist, song, wav
+Tags: sell audio, audio player, music player, html5 audio player, html audio player, audioplayer, radio, mp3, play songs, listen, music, ogg, producer, artist, wav
 Requires at least: 3.6.0
 Tested up to: 4.2.2
 Stable tag: trunk

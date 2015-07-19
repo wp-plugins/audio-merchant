@@ -3,7 +3,7 @@
  * Plugin Name: Audio Merchant Lite
  * Plugin URI: http://www.MyAudioMerchant.com
  * Description: Plugin that allows you to sell/showcase your audio directly to your listeners with built-in HTML5 player.
- * Version: 5.0.1
+ * Version: 5.0.2
  * Author: Audio Merchant
  * Author URI: http://www.MyAudioMerchant.com
  * Text Domain: audio-merchant
@@ -11,7 +11,7 @@
  */
 /**
  * @package Audio Merchant
- * @version 5.0.1
+ * @version 5.0.2
  * @author Audio Merchant <info@MyAudioMerchant.com>
  * @copyright (C) Copyright 2015 Audio Merchant, MyAudioMerchant.com. All rights reserved.
  * @license GNU/GPL http://www.gnu.org/licenses/gpl-3.0.txt
@@ -73,11 +73,23 @@ add_action('wp_ajax_nopriv_audio_merchant_download', 'audio_merchant_download_fr
 add_action('wp_ajax_audio_merchant_check_order_status', 'audio_merchant_check_order_status');
 add_action('wp_ajax_nopriv_audio_merchant_check_order_status', 'audio_merchant_check_order_status');
 
+$audio_merchant_db_version = '5.0.2';
+
+function audio_merchant_db_check() 
+{
+    global $audio_merchant_db_version;
+	
+    if (get_option('audio_merchant_db_version') != $audio_merchant_db_version) 
+	{
+        audio_merchant_db_install();
+    }
+}
+
+add_action('plugins_loaded', 'audio_merchant_db_check');
+
 function audio_merchant_db_install() 
 {
-	global $wpdb;
-	
-	require_once ABSPATH.'wp-admin/includes/upgrade.php';
+	global $wpdb, $audio_merchant_db_version;
 	
 	$sql = "CREATE TABLE IF NOT EXISTS ".$wpdb->prefix."audio_merchant_audio (
 				audio_id INT UNSIGNED NOT NULL AUTO_INCREMENT, 
@@ -95,7 +107,7 @@ function audio_merchant_db_install()
 				UNIQUE KEY audio_id (audio_id), 
 				INDEX idx_audio_display_name (audio_id, audio_display_name) 
 			) ".$wpdb->get_charset_collate().";";
-	dbDelta($sql);
+	$wpdb->query($sql);
 	
 	$sql = "CREATE TABLE IF NOT EXISTS ".$wpdb->prefix."audio_merchant_playlist (
 				player_id INT UNSIGNED NOT NULL AUTO_INCREMENT, 
@@ -109,7 +121,7 @@ function audio_merchant_db_install()
 				UNIQUE KEY player_id (player_id), 
 				INDEX idx_player_search (player_id, player_name, player_filter_value)
 			) ".$wpdb->get_charset_collate().";";
-	dbDelta($sql);
+	$wpdb->query($sql);
 	
 	$sql = "CREATE TABLE IF NOT EXISTS ".$wpdb->prefix."audio_merchant_order (
 				order_id CHAR(32) NOT NULL, 
@@ -126,7 +138,9 @@ function audio_merchant_db_install()
 				UNIQUE KEY order_id (order_id), 
 				INDEX idx_order_search (order_id, user_id, order_transaction_id, order_status, order_customer_name, order_customer_email, audio_id, order_license_type) 
 			) ".$wpdb->get_charset_collate().";";
-	dbDelta($sql);
+	$wpdb->query($sql);
+	
+	update_option('audio_merchant_db_version', $audio_merchant_db_version);
 }
 
 function audio_merchant_get_default_css()
@@ -357,6 +371,8 @@ function audio_merchant_download_free()
 	
 	$defaultErrorMsg = __('This download is no longer available.', 'audio-merchant');
 	
+	$sql = '';
+	
 	if(isset($_GET['t']))
 	{
 		if((int)audio_merchant_get_setting('purchase_user_login_required') > 0 && !current_user_can('manage_options'))
@@ -408,7 +424,8 @@ function audio_merchant_download_free()
 		}
 		
 		$sql = 'SELECT 
-					audio_file 
+					audio_file, 
+					audio_lease_additional_file AS \'additional_file\' 
 				FROM '.$wpdb->prefix.'audio_merchant_audio 
 				WHERE audio_id = '.$audioId.' 
 				AND audio_lease_price = 0.00 
@@ -420,14 +437,7 @@ function audio_merchant_download_free()
 	
 	if(!empty($audioRecord))
 	{
-		if(isset($_GET['t']) && isset($audioRecord['additional_file']) && isset($_GET['additional_file']) && (int)$_GET['additional_file'] > 0)
-		{
-			$downloadFile = $audioRecord['additional_file'];
-		}
-		else
-		{
-			$downloadFile = $audioRecord['audio_file'];
-		}
+		$downloadFile = $audioRecord['additional_file'];
 		
 		if(preg_match('@^https?://@i', $downloadFile))
 		{
@@ -594,6 +604,23 @@ function audio_merchant_html_player()
 			WHERE audio_id IN ('.$audioIds.') 
 			'.$excludeClause.' 
 			ORDER BY FIELD(audio_id, '.$audioIds.');';
+		
+		$audioRecords = $wpdb->get_results($sql, ARRAY_A);
+	}
+	else
+	{
+		$sql = 'SELECT 
+				audio_id, 
+				audio_display_name,
+				audio_lease_price, 
+				audio_exclusive_price,
+				audio_cover_photo,
+				audio_file,
+				audio_file_preview, 
+				audio_duration 
+			FROM '.$wpdb->prefix.'audio_merchant_audio 
+			WHERE audio_id > 0 
+			'.$excludeClause.';';
 		
 		$audioRecords = $wpdb->get_results($sql, ARRAY_A);
 	}
@@ -1360,73 +1387,6 @@ function audio_merchant_add_audio_file()
 			break;
 	}
 	
-	$fullQualityAudioFile = '';
-	
-	switch($_POST['audio_mode'])
-	{
-		case 'upload':
-			if(isset($_FILES['audio_upload_file']['name']) && !empty($_FILES['audio_upload_file']['name']))
-			{
-				$fileType = strtolower(end((explode('.', $_FILES['audio_upload_file']['name']))));
-				
-				if(!in_array($fileType, $supportedAudioExtensions) || $_FILES['audio_upload_file']['error'] <> 0)
-				{
-					$result['errors'][] = __('Invalid Full Quality Audio File', 'audio-merchant');
-				}
-				else
-				{
-					$fullQualityAudioFile = audio_merchant_move_uploaded_file_to_inventory($_FILES['audio_upload_file']);
-					
-					if(empty($fullQualityAudioFile))
-					{
-						$result['errors'][] = __('Invalid Upload Directory Permissions', 'audio-merchant');
-					}
-				}
-			}
-			else
-			{
-				$result['errors'][] = __('Invalid Full Quality Audio File', 'audio-merchant');
-			}
-			
-			break;
-		
-		case 'url':
-			if(isset($_POST['audio_url_file']) && !empty($_POST['audio_url_file']))
-			{
-				if(!preg_match('@^https?://@i', $_POST['audio_url_file']))
-				{
-					$result['errors'][] = __('Invalid Full Quality Audio File', 'audio-merchant');
-				}
-				else
-				{
-					$fullQualityAudioFile = $_POST['audio_url_file'];
-				}
-			}
-			else
-			{
-				$result['errors'][] = __('Invalid Full Quality Audio File', 'audio-merchant');
-			}
-			
-			break;
-		
-		case 'existing':
-			if(isset($_POST['audio_existing_file']) && !empty($_POST['audio_existing_file']))
-			{
-				$fullQualityAudioFile = $_POST['audio_existing_file'];
-			}
-			else
-			{
-				$result['errors'][] = __('Invalid Full Quality Audio File', 'audio-merchant');
-			}
-			
-			break;
-			
-		default:
-			$result['errors'][] = __('Invalid Full Quality Audio File OR you have exceeded your webserver\'s php.ini post_max_size setting which is currently set to '.ini_get('post_max_size').' and/or your upload_max_filesize setting which is currently set to '.ini_get('upload_max_filesize').'. Please check all of the above and try your request again.', 'audio-merchant');
-			
-			break;
-	}
-	
 	$previewAudioFile = '';
 	
 	switch($_POST['preview_audio_mode'])
@@ -1590,17 +1550,26 @@ function audio_merchant_add_audio_file()
 			break;
 	}
 	
+	if(empty($additionalFileLease) && empty($additionalFileExclusive))
+	{
+		$result['errors'][] = __('File To Provide Required', 'audio-merchant');
+	}
+	elseif($leasePrice == 0 && $exclusivePrice == 0 && empty($additionalFileLease))
+	{
+		$result['errors'][] = __('Free File To Provide Required', 'audio-merchant');
+	}
+	
 	if(empty($result['errors']))
 	{
 		if(empty($displayName))
 		{
-			if(preg_match('@^https?://@i', $fullQualityAudioFile))
+			if(preg_match('@^https?://@i', $previewAudioFile))
 			{
-				$displayName = trim(preg_replace('@\.[^\.]+?$@i', '', urldecode(basename($fullQualityAudioFile)), 1));
+				$displayName = trim(preg_replace('@\.[^\.]+?$@i', '', urldecode(basename($previewAudioFile)), 1));
 			}
 			else
 			{
-				$displayName = trim(preg_replace('@-[^-]+?$@i', '', urldecode(basename($fullQualityAudioFile)), 1));
+				$displayName = trim(preg_replace('@-[^-]+?$@i', '', urldecode(basename($previewAudioFile)), 1));
 			}
 			
 			if(empty($displayName))
@@ -1620,7 +1589,7 @@ function audio_merchant_add_audio_file()
 						'audio_lease_price' => $leasePrice,
 						'audio_exclusive_price' => $exclusivePrice,
 						'audio_cover_photo' => $coverPhoto,
-						'audio_file' => $fullQualityAudioFile,
+						'audio_file' => $previewAudioFile,
 						'audio_file_preview' => $previewAudioFile,
 						'audio_lease_additional_file' => $additionalFileLease,
 						'audio_exclusive_additional_file' => $additionalFileExclusive,
@@ -1652,7 +1621,7 @@ function audio_merchant_add_audio_file()
 						'audio_lease_price' => $leasePrice,
 						'audio_exclusive_price' => $exclusivePrice,
 						'audio_cover_photo' => $coverPhoto,
-						'audio_file' => $fullQualityAudioFile,
+						'audio_file' => $previewAudioFile,
 						'audio_file_preview' => $previewAudioFile,
 						'audio_lease_additional_file' => $additionalFileLease,
 						'audio_exclusive_additional_file' => $additionalFileExclusive,
@@ -1783,7 +1752,7 @@ function audio_merchant_render_player($audioIds=array(), $playerId=0, $height=40
 	
 	if($playerId > 0)
 	{
-		$html = '<iframe width="100%" height="'.(string)$height.'" scrolling="no" frameborder="no" src="'.audio_merchant_make_url_protocol_less(admin_url('admin-ajax.php?action=audio_merchant_html_player'.$urlDivider.'playlist_id='.(string)$playerId.$urlDivider.'height='.(string)$height.$urlDivider.'autoplay='.(string)$autoPlay.$urlDivider.'current_url='.urlencode($currentUrl))).'"></iframe>';
+		$html = '<iframe width="100%" height="'.(string)$height.'" scrolling="no" frameborder="no" src="'.audio_merchant_make_url_protocol_less(admin_url('admin-ajax.php?action=audio_merchant_html_player'.$urlDivider.'nocache=1'.$urlDivider.'playlist_id='.(string)$playerId.$urlDivider.'height='.(string)$height.$urlDivider.'autoplay='.(string)$autoPlay.$urlDivider.'current_url='.urlencode($currentUrl))).'"></iframe>';
 	}
 	elseif(!empty($audioIds))
 	{
@@ -1792,7 +1761,11 @@ function audio_merchant_render_player($audioIds=array(), $playerId=0, $height=40
 			$audioIds = implode(',', $audioIds);
 		}
 		
-		$html = '<iframe width="100%" height="'.(string)$height.'" scrolling="no" frameborder="no" src="'.audio_merchant_make_url_protocol_less(admin_url('admin-ajax.php?action=audio_merchant_html_player'.$urlDivider.'audio_id='.(string)$audioIds.$urlDivider.'height='.(string)$height.$urlDivider.'autoplay='.(string)$autoPlay.$urlDivider.'current_url='.urlencode($currentUrl))).'"></iframe>';
+		$html = '<iframe width="100%" height="'.(string)$height.'" scrolling="no" frameborder="no" src="'.audio_merchant_make_url_protocol_less(admin_url('admin-ajax.php?action=audio_merchant_html_player'.$urlDivider.'nocache=1'.$urlDivider.'audio_id='.(string)$audioIds.$urlDivider.'height='.(string)$height.$urlDivider.'autoplay='.(string)$autoPlay.$urlDivider.'current_url='.urlencode($currentUrl))).'"></iframe>';
+	}
+	else
+	{
+		$html = '<iframe width="100%" height="'.(string)$height.'" scrolling="no" frameborder="no" src="'.audio_merchant_make_url_protocol_less(admin_url('admin-ajax.php?action=audio_merchant_html_player'.$urlDivider.'nocache=1'.$urlDivider.'audio_id='.$urlDivider.'height='.(string)$height.$urlDivider.'autoplay='.(string)$autoPlay.$urlDivider.'current_url='.urlencode($currentUrl))).'"></iframe>';
 	}
 	
 	if((int)audio_merchant_get_setting('show_author_link') > 0)

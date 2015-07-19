@@ -1,6 +1,6 @@
 /**
  * @package Audio Merchant
- * @version 5.0.1
+ * @version 5.0.2
  * @author Audio Merchant <info@MyAudioMerchant.com>
  * @copyright (C) Copyright 2015 Audio Merchant, MyAudioMerchant.com. All rights reserved.
  * @license GNU/GPL http://www.gnu.org/licenses/gpl-3.0.txt
@@ -336,13 +336,33 @@ jQuery(document).ready(function ($) {
 		"columnDefs": [
             {
                 "render": function (data, type, row) {
+					var result = '';
+					
 					if (/^https?:/i.test(data)) {
-						return '<a href="'+data+'" target="_blank">'+data+'</a>';
+						result += '<a href="'+data+'" target="_blank">';
+						
+						if (String(data).length > 30) {
+							result += String(data).substring(0, 30)+'...';
+						} else {
+							result += data;
+						}
+						
+						result += '</a>';
 					} else if(!data) {
-						return data;
+						result += '';
 					} else {
-						return '<a href="'+uploadBaseUrl+'/'+data+'" target="_blank">'+data+'</a>';
+						result += '<a href="'+uploadBaseUrl+'/'+data+'" target="_blank">';
+						
+						if (String(data).length > 30) {
+							result += String(data).substring(0, 30)+'...';
+						} else {
+							result += data;
+						}
+						
+						result += '</a>';
 					}
+					
+					return result;
                 }, "targets": [5,7,8]
             },{
                 "render": function (data, type, row) {

@@ -1,7 +1,7 @@
 <?php
 /**
  * @package Audio Merchant
- * @version 5.0.1
+ * @version 5.0.2
  * @author Audio Merchant <info@MyAudioMerchant.com>
  * @copyright (C) Copyright 2015 Audio Merchant, MyAudioMerchant.com. All rights reserved.
  * @license GNU/GPL http://www.gnu.org/licenses/gpl-3.0.txt
@@ -63,8 +63,8 @@ if(!get_option('css_frontend_default'))
 						<th><?php echo __('Cover Photo', 'audio-merchant'); ?></th>
 						<th><?php echo __('Audio File', 'audio-merchant'); ?></th>
 						<th><?php echo __('Audio Preview File', 'audio-merchant'); ?></th>
-						<th><?php echo __('Additional Lease File', 'audio-merchant'); ?></th>
-						<th><?php echo __('Additional Exclusive File', 'audio-merchant'); ?></th>
+						<th><?php echo __('Lease File', 'audio-merchant'); ?></th>
+						<th><?php echo __('Exclusive File', 'audio-merchant'); ?></th>
 						<th><?php echo __('Audio Duration', 'audio-merchant'); ?></th>
 						<th><?php echo __('Date Created', 'audio-merchant'); ?></th>
 						<th><?php echo __('Last Modified', 'audio-merchant'); ?></th>
@@ -81,79 +81,22 @@ if(!get_option('css_frontend_default'))
 						<br />
 
 						<label for="audio_lease_price"><?php echo __('Lease Price:', 'audio-merchant'); ?></label>
-						<input type="text" name="audio_lease_price" id="audio_lease_price" value="" placeholder="<?php echo __('Example Format: 20.00', 'audio-merchant'); ?>" class="text ui-widget-content ui-corner-all" /> <img src="<?php echo audio_merchant_make_url_protocol_less(plugins_url('images/question_mark.png', __FILE__)); ?>" width="15" height="15" align="absmiddle" border="0" alt="" title="<?php echo __('The price to purchase a lease license and download the full quality audio file. Set to 0 to disable this option. If lease price AND exclusive price are both set to 0 then this file will be available for free download.', 'audio-merchant'); ?>" />
+						<input type="text" name="audio_lease_price" id="audio_lease_price" maxlength="13" value="" placeholder="<?php echo __('Example Format: 20.00', 'audio-merchant'); ?>" class="text ui-widget-content ui-corner-all" /> <img src="<?php echo audio_merchant_make_url_protocol_less(plugins_url('images/question_mark.png', __FILE__)); ?>" width="15" height="15" align="absmiddle" border="0" alt="" title="<?php echo __('The price to purchase a lease license and download the full quality audio file. Set to 0 to disable this option. If lease price AND exclusive price are both set to 0 then this file will be available for free download.', 'audio-merchant'); ?>" />
 						<br /><br />
 						<label for="audio_exclusive_price"><?php echo __('Exclusive Price:', 'audio-merchant'); ?></label>
-						<input type="text" name="audio_exclusive_price" id="audio_exclusive_price" value="" placeholder="<?php echo __('Example Format: 200.00', 'audio-merchant'); ?>" class="text ui-widget-content ui-corner-all" /> <img src="<?php echo audio_merchant_make_url_protocol_less(plugins_url('images/question_mark.png', __FILE__)); ?>" width="15" height="15" align="absmiddle" border="0" alt="" title="<?php echo __('The price to purchase an exclusive license and download the full quality audio file. When files are purchased exclusively, they are removed from the frontend player after a successfull checkout. Set to 0 to disable this option. If exclusive price AND lease price are both set to 0 then this file will be available for free download.', 'audio-merchant'); ?>" />
+						<input type="text" name="audio_exclusive_price" id="audio_exclusive_price" maxlength="13" value="" placeholder="<?php echo __('Example Format: 200.00', 'audio-merchant'); ?>" class="text ui-widget-content ui-corner-all" /> <img src="<?php echo audio_merchant_make_url_protocol_less(plugins_url('images/question_mark.png', __FILE__)); ?>" width="15" height="15" align="absmiddle" border="0" alt="" title="<?php echo __('The price to purchase an exclusive license and download the full quality audio file. When files are purchased exclusively, they are removed from the frontend player after a successfull checkout. Set to 0 to disable this option. If exclusive price AND lease price are both set to 0 then this file will be available for free download.', 'audio-merchant'); ?>" />
 
 						<br />
 						<br />
-						<div class="upload_file_wrapper">
-							<div id="cover_photo_upload_file_wrapper">
-								<label for="cover_photo_upload_file"><?php echo __('Cover Photo:', 'audio-merchant'); ?></label>
-								<input type="file" name="cover_photo_upload_file" id="cover_photo_upload_file" class="text ui-widget-content ui-corner-all" /> <img src="<?php echo audio_merchant_make_url_protocol_less(plugins_url('images/question_mark.png', __FILE__)); ?>" width="15" height="15" align="absmiddle" border="0" alt="" title="<?php echo __('The image that represents this audio file. This is the image displayed on the frontend player when this song is being played. The image width and height should be proportional. We recommend a size of 200 x 200 pixels, however this field is flexible and will accept any image dimensions and will resize them automatically. Acceptable formats are: .png, .jpg, .gif', 'audio-merchant'); ?>" />
-							</div>
-							<div id="cover_photo_url_file_wrapper" class="hidden">
-								<label for="cover_photo_url_file"><?php echo __('Cover Photo:', 'audio-merchant'); ?></label>
-								<input type="text" name="cover_photo_url_file" id="cover_photo_url_file" value="" placeholder="http://externalserver.com/my_cover_photo.jpg" class="text ui-widget-content ui-corner-all" /> <img src="<?php echo audio_merchant_make_url_protocol_less(plugins_url('images/question_mark.png', __FILE__)); ?>" width="15" height="15" align="absmiddle" border="0" alt="" title="<?php echo __('The image that represents this audio file. This is the image displayed on the frontend player when this song is being played. The image width and height should be proportional. We recommend a size of 200 x 200 pixels, however this field is flexible and will accept any image dimensions and will resize them automatically. Acceptable formats are: .png, .jpg, .gif', 'audio-merchant'); ?>" />
-							</div>
-							<div id="cover_photo_existing_file_wrapper" class="hidden">
-								<?php echo __('Cover Photo:', 'audio-merchant'); ?>
-								<span class="existing_file_scroller">
-									<?php
-									$existingFiles = array();
-
-									if(file_exists($uploadDir))
-									{
-										if($supportedImageTypes)
-										{
-											foreach($supportedImageTypes as $supportedExtension)
-											{
-												foreach(glob($uploadDir.DIRECTORY_SEPARATOR.'*.'.$supportedExtension) as $file) 
-												{
-													$existingFiles[] = $file;
-												}
-
-												foreach(glob($uploadDir.DIRECTORY_SEPARATOR.'*.'.strtoupper($supportedExtension)) as $file) 
-												{
-													$existingFiles[] = $file;
-												}
-											}
-
-											$existingFiles = array_unique($existingFiles);
-										}
-									}
-
-									if(!empty($existingFiles))
-									{
-										foreach($existingFiles as $key => $existingFile)
-										{
-											$filename = basename($existingFile);
-
-											echo '<span><input type="radio" name="cover_photo_existing_file" id="cover_photo_existing_file_'.$key.'" value="'.$filename.'" /><label for="cover_photo_existing_file_'.$key.'"><img src="'.audio_merchant_make_url_protocol_less($uploadUrl).'/'.$filename.'" width="50" height="50" border="0" alt="" /><br /><a href="'.$uploadUrl.'/'.$filename.'" target="_blank" title="'.$filename.'">'.substr($filename, 0, 9).'...</a></label></span>';
-										}
-									}
-									else 
-									{
-										echo '<span class="warning_msg">'.__('There are currently no files uploaded!', 'audio-merchant').'</span>';
-									}
-									?>
-								</span> <img src="<?php echo audio_merchant_make_url_protocol_less(plugins_url('images/question_mark.png', __FILE__)); ?>" width="15" height="15" align="absmiddle" border="0" alt="" title="<?php echo __('The image that represents this audio file. This is the image displayed on the frontend player when this song is being played. The image width and height should be proportional. We recommend a size of 200 x 200 pixels, however this field is flexible and will accept any image dimensions and will resize them automatically. Acceptable formats are: .png, .jpg, .gif', 'audio-merchant'); ?>" />
-							</div>
-							<div class="small_url_container">
-								<input type="hidden" class="upload_mode" name="cover_photo_mode" value="upload" />
-								<a id="cover_photo_upload_link" class="hidden" href="javascript: void(0);" onclick="javascript: return toggle_upload_field('upload', document.getElementById('cover_photo_upload_link'), 'cover_photo_upload_file_wrapper');"><?php echo __('Upload File', 'audio-merchant'); ?></a> <a id="cover_photo_url_link" href="javascript: void(0);" onclick="javascript: return toggle_upload_field('url', document.getElementById('cover_photo_url_link'), 'cover_photo_url_file_wrapper');"><?php echo __('Specify URL', 'audio-merchant'); ?></a> <a id="cover_photo_existing_link" class="last_small_url" href="javascript: void(0);" onclick="javascript: return toggle_upload_field('existing', document.getElementById('cover_photo_existing_link'), 'cover_photo_existing_file_wrapper');"><?php echo __('Select Existing File', 'audio-merchant'); ?></a>
-							</div>
-							<div class="clear"></div>
-						</div>
-						<div class="upload_file_wrapper">
+						
+						<div class="upload_file_wrapper hidden">
 							<div id="audio_upload_file_wrapper">
 								<label for="audio_upload_file"><?php echo __('Full Quality Audio File:', 'audio-merchant'); ?></label>
 								<input type="file" name="audio_upload_file" id="audio_upload_file" class="text ui-widget-content ui-corner-all" /> <img src="<?php echo audio_merchant_make_url_protocol_less(plugins_url('images/question_mark.png', __FILE__)); ?>" width="15" height="15" align="absmiddle" border="0" alt="" title="<?php echo __('This is the full quality audio file that is delivered to the buyer at the end of a successful purchase. This file should NOT contain any audio watermarks. Acceptable formats are: .wav, .mp3, .ogg, .m4a', 'audio-merchant'); ?>" />
 							</div>
 							<div id="audio_url_file_wrapper" class="hidden">
 								<label for="audio_url_file"><?php echo __('Full Quality Audio File:', 'audio-merchant'); ?></label>
-								<input type="text" name="audio_url_file" id="audio_url_file" value="" placeholder="http://externalserver.com/my_audio_file.wav" class="text ui-widget-content ui-corner-all" /> <img src="<?php echo audio_merchant_make_url_protocol_less(plugins_url('images/question_mark.png', __FILE__)); ?>" width="15" height="15" align="absmiddle" border="0" alt="" title="<?php echo __('This is the full quality audio file that is delivered to the buyer at the end of a successful purchase. This file should NOT contain any audio watermarks. Acceptable formats are: .wav, .mp3, .ogg, .m4a', 'audio-merchant'); ?>" />
+								<input type="text" name="audio_url_file" id="audio_url_file" value="" maxlength="250" placeholder="http://externalserver.com/my_audio_file.wav" class="text ui-widget-content ui-corner-all" /> <img src="<?php echo audio_merchant_make_url_protocol_less(plugins_url('images/question_mark.png', __FILE__)); ?>" width="15" height="15" align="absmiddle" border="0" alt="" title="<?php echo __('This is the full quality audio file that is delivered to the buyer at the end of a successful purchase. This file should NOT contain any audio watermarks. Acceptable formats are: .wav, .mp3, .ogg, .m4a', 'audio-merchant'); ?>" />
 							</div>
 							<div id="audio_existing_file_wrapper" class="hidden">
 								<?php echo __('Full Quality Audio File:', 'audio-merchant'); ?>
@@ -211,7 +154,7 @@ if(!get_option('css_frontend_default'))
 							</div>
 							<div id="preview_audio_url_file_wrapper" class="hidden">
 								<label for="preview_audio_url_file"><?php echo __('Preview Audio File:', 'audio-merchant'); ?></label>
-								<input type="text" name="preview_audio_url_file" id="preview_audio_url_file" value="" placeholder="http://externalserver.com/my_audio_preview_file.wav" class="text ui-widget-content ui-corner-all" /> <img src="<?php echo audio_merchant_make_url_protocol_less(plugins_url('images/question_mark.png', __FILE__)); ?>" width="15" height="15" align="absmiddle" border="0" alt="" title="<?php echo __('This is the audio file that the guest listens to on the frontend player BEFORE they purchase the full quality audio file. This file is used as a form of protection, and MAY contain audio watermarks and/or other forms of protection. This file may even be shorter than the full quality audio file, if you choose. Alternatively, you can play the full quality audio file for your guests as the preview file, which we HIGHLY discourage, by re-uploading your full quality audio file again in this field, however we HIGHLY recommend differentiating your preview file audo file and your full quality audio file for security reasons. Acceptable formats are: .wav, .mp3, .ogg, .m4a', 'audio-merchant'); ?>" />
+								<input type="text" name="preview_audio_url_file" id="preview_audio_url_file" value="" maxlength="250" placeholder="http://externalserver.com/my_audio_preview_file.wav" class="text ui-widget-content ui-corner-all" /> <img src="<?php echo audio_merchant_make_url_protocol_less(plugins_url('images/question_mark.png', __FILE__)); ?>" width="15" height="15" align="absmiddle" border="0" alt="" title="<?php echo __('This is the audio file that the guest listens to on the frontend player BEFORE they purchase the full quality audio file. This file is used as a form of protection, and MAY contain audio watermarks and/or other forms of protection. This file may even be shorter than the full quality audio file, if you choose. Alternatively, you can play the full quality audio file for your guests as the preview file, which we HIGHLY discourage, by re-uploading your full quality audio file again in this field, however we HIGHLY recommend differentiating your preview file audo file and your full quality audio file for security reasons. Acceptable formats are: .wav, .mp3, .ogg, .m4a', 'audio-merchant'); ?>" />
 							</div>
 							<div id="preview_audio_existing_file_wrapper" class="hidden">
 								<?php echo __('Preview Audio File:', 'audio-merchant'); ?>
@@ -264,15 +207,15 @@ if(!get_option('css_frontend_default'))
 						</div>
 						<div class="upload_file_wrapper">
 							<div id="additional_lease_file_wrapper">
-								<label for="additional_lease_file"><?php echo __('Additional File To Provide With Lease Purchase:', 'audio-merchant'); ?></label>
-								<input type="file" name="additional_lease_file" id="additional_lease_file" class="text ui-widget-content ui-corner-all" /> <img src="<?php echo audio_merchant_make_url_protocol_less(plugins_url('images/question_mark.png', __FILE__)); ?>" width="15" height="15" align="absmiddle" border="0" alt="" title="<?php echo __('This file is provided to buyers AFTER they purchase a lease license. This is a great place to provide additional license files (.pdf), or any other file that may relate to your audio file. Accepts any file format. If you wish to provide multiple files, please archive (.zip, .rar, etc.) them up into one file first, then upload that file here.', 'audio-merchant'); ?>" />
+								<label for="additional_lease_file"><?php echo __('File To Provide With Lease Purchase Or Free Download:', 'audio-merchant'); ?></label>
+								<input type="file" name="additional_lease_file" id="additional_lease_file" class="text ui-widget-content ui-corner-all" /> <img src="<?php echo audio_merchant_make_url_protocol_less(plugins_url('images/question_mark.png', __FILE__)); ?>" width="15" height="15" align="absmiddle" border="0" alt="" title="<?php echo __('This file is provided to buyers AFTER they purchase a lease license. Accepts any file format. If you wish to provide multiple files, please archive (.zip, .rar, etc.) them up into one file first, then upload that file here.', 'audio-merchant'); ?>" />
 							</div>
 							<div id="additional_lease_url_file_wrapper" class="hidden">
-								<label for="additional_lease_url_file"><?php echo __('Additional File To Provide With Lease Purchase:', 'audio-merchant'); ?></label>
-								<input type="text" name="additional_lease_url_file" id="additional_lease_url_file" value="" placeholder="http://externalserver.com/my_additional_lease_file.zip" class="text ui-widget-content ui-corner-all" /> <img src="<?php echo audio_merchant_make_url_protocol_less(plugins_url('images/question_mark.png', __FILE__)); ?>" width="15" height="15" align="absmiddle" border="0" alt="" title="<?php echo __('This file is provided to buyers AFTER they purchase a lease license. This is a great place to provide additional license files (.pdf), or any other file that may relate to your audio file. Accepts any file format. If you wish to provide multiple files, please archive (.zip, .rar, etc.) them up into one file first, then upload that file here.', 'audio-merchant'); ?>" />
+								<label for="additional_lease_url_file"><?php echo __('File To Provide With Lease Purchase Or Free Download:', 'audio-merchant'); ?></label>
+								<input type="text" name="additional_lease_url_file" id="additional_lease_url_file" value="" maxlength="250" placeholder="http://externalserver.com/my_full_quality_file.zip" class="text ui-widget-content ui-corner-all" /> <img src="<?php echo audio_merchant_make_url_protocol_less(plugins_url('images/question_mark.png', __FILE__)); ?>" width="15" height="15" align="absmiddle" border="0" alt="" title="<?php echo __('This file is provided to buyers AFTER they purchase a lease license. Accepts any file format. If you wish to provide multiple files, please archive (.zip, .rar, etc.) them up into one file first, then upload that file here.', 'audio-merchant'); ?>" />
 							</div>
 							<div id="additional_lease_existing_file_wrapper" class="hidden">
-								<?php echo __('Additional File To Provide With Lease Purchase:', 'audio-merchant'); ?>
+								<?php echo __('File To Provide With Lease Purchase Or Free Download:', 'audio-merchant'); ?>
 								<span class="existing_file_scroller">
 									<?php
 									$existingAudioFiles = array();
@@ -320,7 +263,7 @@ if(!get_option('css_frontend_default'))
 										echo '<span class="warning_msg">'.__('There are currently no files uploaded!', 'audio-merchant').'</span>';
 									}
 									?>
-								</span> <img src="<?php echo audio_merchant_make_url_protocol_less(plugins_url('images/question_mark.png', __FILE__)); ?>" width="15" height="15" align="absmiddle" border="0" alt="" title="<?php echo __('This file is provided to buyers AFTER they purchase a lease license. This is a great place to provide additional license files (.pdf), or any other file that may relate to your audio file. Accepts any file format. If you wish to provide multiple files, please archive (.zip, .rar, etc.) them up into one file first, then upload that file here.', 'audio-merchant'); ?>" />
+								</span> <img src="<?php echo audio_merchant_make_url_protocol_less(plugins_url('images/question_mark.png', __FILE__)); ?>" width="15" height="15" align="absmiddle" border="0" alt="" title="<?php echo __('This file is provided to buyers AFTER they purchase a lease license. Accepts any file format. If you wish to provide multiple files, please archive (.zip, .rar, etc.) them up into one file first, then upload that file here.', 'audio-merchant'); ?>" />
 							</div>
 							<div class="small_url_container">
 								<input type="hidden" class="upload_mode" name="addtional_file_lease_mode" value="upload" />
@@ -331,15 +274,15 @@ if(!get_option('css_frontend_default'))
 
 						<div class="upload_file_wrapper">
 							<div id="additional_exclusive_file_wrapper">
-								<label for="additional_exclusive_file"><?php echo __('Additional File To Provide With Exclusive Purchase:', 'audio-merchant'); ?></label>
-								<input type="file" name="additional_exclusive_file" id="additional_exclusive_file" class="text ui-widget-content ui-corner-all" /> <img src="<?php echo audio_merchant_make_url_protocol_less(plugins_url('images/question_mark.png', __FILE__)); ?>" width="15" height="15" align="absmiddle" border="0" alt="" title="<?php echo __('This file is provided to buyers AFTER they purchase an exclusive license. This is a great place to provide tracked out wav files or any additional license files (.pdf) that may relate to your audio file. Accepts any file format. If you wish to provide multiple files, please archive (.zip, .rar, etc.) them up into one file first, then upload that file here.', 'audio-merchant'); ?>" />
+								<label for="additional_exclusive_file"><?php echo __('File To Provide With Exclusive Purchase:', 'audio-merchant'); ?></label>
+								<input type="file" name="additional_exclusive_file" id="additional_exclusive_file" class="text ui-widget-content ui-corner-all" /> <img src="<?php echo audio_merchant_make_url_protocol_less(plugins_url('images/question_mark.png', __FILE__)); ?>" width="15" height="15" align="absmiddle" border="0" alt="" title="<?php echo __('This file is provided to buyers AFTER they purchase an exclusive license. Accepts any file format. If you wish to provide multiple files, please archive (.zip, .rar, etc.) them up into one file first, then upload that file here.', 'audio-merchant'); ?>" />
 							</div>
 							<div id="additional_exclusive_url_file_wrapper" class="hidden">
-								<label for="additional_exclusive_url_file"><?php echo __('Additional File To Provide With Exclusive Purchase:', 'audio-merchant'); ?></label>
-								<input type="text" name="additional_exclusive_url_file" id="additional_exclusive_url_file" value="" placeholder="http://externalserver.com/my_additional_exclusive_file.zip" class="text ui-widget-content ui-corner-all" /> <img src="<?php echo audio_merchant_make_url_protocol_less(plugins_url('images/question_mark.png', __FILE__)); ?>" width="15" height="15" align="absmiddle" border="0" alt="" title="<?php echo __('This file is provided to buyers AFTER they purchase an exclusive license. This is a great place to provide tracked out wav files or any additional license files (.pdf) that may relate to your audio file. Accepts any file format. If you wish to provide multiple files, please archive (.zip, .rar, etc.) them up into one file first, then upload that file here.', 'audio-merchant'); ?>" />
+								<label for="additional_exclusive_url_file"><?php echo __('File To Provide With Exclusive Purchase:', 'audio-merchant'); ?></label>
+								<input type="text" name="additional_exclusive_url_file" id="additional_exclusive_url_file" value="" maxlength="250" placeholder="http://externalserver.com/my_full_quality_file.zip" class="text ui-widget-content ui-corner-all" /> <img src="<?php echo audio_merchant_make_url_protocol_less(plugins_url('images/question_mark.png', __FILE__)); ?>" width="15" height="15" align="absmiddle" border="0" alt="" title="<?php echo __('This file is provided to buyers AFTER they purchase an exclusive license. Accepts any file format. If you wish to provide multiple files, please archive (.zip, .rar, etc.) them up into one file first, then upload that file here.', 'audio-merchant'); ?>" />
 							</div>
 							<div id="additional_exclusive_existing_file_wrapper" class="hidden">
-								<?php echo __('Additional File To Provide With Exclusive Purchase:', 'audio-merchant'); ?>
+								<?php echo __('File To Provide With Exclusive Purchase:', 'audio-merchant'); ?>
 								<span class="existing_file_scroller">
 									<?php
 									$existingAudioFiles = array();
@@ -387,7 +330,7 @@ if(!get_option('css_frontend_default'))
 										echo '<span class="warning_msg">'.__('There are currently no files uploaded!', 'audio-merchant').'</span>';
 									}
 									?>
-								</span> <img src="<?php echo audio_merchant_make_url_protocol_less(plugins_url('images/question_mark.png', __FILE__)); ?>" width="15" height="15" align="absmiddle" border="0" alt="" title="<?php echo __('This file is provided to buyers AFTER they purchase an exclusive license. This is a great place to provide tracked out wav files or any additional license files (.pdf) that may relate to your audio file. Accepts any file format. If you wish to provide multiple files, please archive (.zip, .rar, etc.) them up into one file first, then upload that file here.', 'audio-merchant'); ?>" />
+								</span> <img src="<?php echo audio_merchant_make_url_protocol_less(plugins_url('images/question_mark.png', __FILE__)); ?>" width="15" height="15" align="absmiddle" border="0" alt="" title="<?php echo __('This file is provided to buyers AFTER they purchase an exclusive license. Accepts any file format. If you wish to provide multiple files, please archive (.zip, .rar, etc.) them up into one file first, then upload that file here.', 'audio-merchant'); ?>" />
 							</div>
 							<div class="small_url_container">
 								<input type="hidden" class="upload_mode" name="addtional_file_exclusive_mode" value="upload" />
@@ -395,6 +338,66 @@ if(!get_option('css_frontend_default'))
 							</div>
 							<div class="clear"></div>
 						</div>
+						
+						<div class="upload_file_wrapper">
+							<div id="cover_photo_upload_file_wrapper">
+								<label for="cover_photo_upload_file"><?php echo __('Cover Photo:', 'audio-merchant'); ?></label>
+								<input type="file" name="cover_photo_upload_file" id="cover_photo_upload_file" class="text ui-widget-content ui-corner-all" /> <img src="<?php echo audio_merchant_make_url_protocol_less(plugins_url('images/question_mark.png', __FILE__)); ?>" width="15" height="15" align="absmiddle" border="0" alt="" title="<?php echo __('The image that represents this audio file. This is the image displayed on the frontend player when this song is being played. The image width and height should be proportional. We recommend a size of 200 x 200 pixels, however this field is flexible and will accept any image dimensions and will resize them automatically. Acceptable formats are: .png, .jpg, .gif', 'audio-merchant'); ?>" />
+							</div>
+							<div id="cover_photo_url_file_wrapper" class="hidden">
+								<label for="cover_photo_url_file"><?php echo __('Cover Photo:', 'audio-merchant'); ?></label>
+								<input type="text" name="cover_photo_url_file" id="cover_photo_url_file" maxlength="250" value="" placeholder="http://externalserver.com/my_cover_photo.jpg" class="text ui-widget-content ui-corner-all" /> <img src="<?php echo audio_merchant_make_url_protocol_less(plugins_url('images/question_mark.png', __FILE__)); ?>" width="15" height="15" align="absmiddle" border="0" alt="" title="<?php echo __('The image that represents this audio file. This is the image displayed on the frontend player when this song is being played. The image width and height should be proportional. We recommend a size of 200 x 200 pixels, however this field is flexible and will accept any image dimensions and will resize them automatically. Acceptable formats are: .png, .jpg, .gif', 'audio-merchant'); ?>" />
+							</div>
+							<div id="cover_photo_existing_file_wrapper" class="hidden">
+								<?php echo __('Cover Photo:', 'audio-merchant'); ?>
+								<span class="existing_file_scroller">
+									<?php
+									$existingFiles = array();
+
+									if(file_exists($uploadDir))
+									{
+										if($supportedImageTypes)
+										{
+											foreach($supportedImageTypes as $supportedExtension)
+											{
+												foreach(glob($uploadDir.DIRECTORY_SEPARATOR.'*.'.$supportedExtension) as $file) 
+												{
+													$existingFiles[] = $file;
+												}
+
+												foreach(glob($uploadDir.DIRECTORY_SEPARATOR.'*.'.strtoupper($supportedExtension)) as $file) 
+												{
+													$existingFiles[] = $file;
+												}
+											}
+
+											$existingFiles = array_unique($existingFiles);
+										}
+									}
+
+									if(!empty($existingFiles))
+									{
+										foreach($existingFiles as $key => $existingFile)
+										{
+											$filename = basename($existingFile);
+
+											echo '<span><input type="radio" name="cover_photo_existing_file" id="cover_photo_existing_file_'.$key.'" value="'.$filename.'" /><label for="cover_photo_existing_file_'.$key.'"><img src="'.audio_merchant_make_url_protocol_less($uploadUrl).'/'.$filename.'" width="50" height="50" border="0" alt="" /><br /><a href="'.$uploadUrl.'/'.$filename.'" target="_blank" title="'.$filename.'">'.substr($filename, 0, 9).'...</a></label></span>';
+										}
+									}
+									else 
+									{
+										echo '<span class="warning_msg">'.__('There are currently no files uploaded!', 'audio-merchant').'</span>';
+									}
+									?>
+								</span> <img src="<?php echo audio_merchant_make_url_protocol_less(plugins_url('images/question_mark.png', __FILE__)); ?>" width="15" height="15" align="absmiddle" border="0" alt="" title="<?php echo __('The image that represents this audio file. This is the image displayed on the frontend player when this song is being played. The image width and height should be proportional. We recommend a size of 200 x 200 pixels, however this field is flexible and will accept any image dimensions and will resize them automatically. Acceptable formats are: .png, .jpg, .gif', 'audio-merchant'); ?>" />
+							</div>
+							<div class="small_url_container">
+								<input type="hidden" class="upload_mode" name="cover_photo_mode" value="upload" />
+								<a id="cover_photo_upload_link" class="hidden" href="javascript: void(0);" onclick="javascript: return toggle_upload_field('upload', document.getElementById('cover_photo_upload_link'), 'cover_photo_upload_file_wrapper');"><?php echo __('Upload File', 'audio-merchant'); ?></a> <a id="cover_photo_url_link" href="javascript: void(0);" onclick="javascript: return toggle_upload_field('url', document.getElementById('cover_photo_url_link'), 'cover_photo_url_file_wrapper');"><?php echo __('Specify URL', 'audio-merchant'); ?></a> <a id="cover_photo_existing_link" class="last_small_url" href="javascript: void(0);" onclick="javascript: return toggle_upload_field('existing', document.getElementById('cover_photo_existing_link'), 'cover_photo_existing_file_wrapper');"><?php echo __('Select Existing File', 'audio-merchant'); ?></a>
+							</div>
+							<div class="clear"></div>
+						</div>
+						
 						<input type="hidden" name="editing_audio_id" id="editing_audio_id" value="" />
 						<!-- Allow form submission with keyboard without duplicating the dialog button -->
 						<input type="submit" tabindex="-1" class="default_submit_button" />

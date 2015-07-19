@@ -8,7 +8,7 @@ Stable tag: trunk
 License: GPLv3 or later
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
 
-Sell or showcase your audio directly to your listeners with this versatile HTML5 audio player.
+Sell or showcase your audio directly to your listeners with this customizable HTML5 audio player.
 
 == Description ==
 
@@ -76,6 +76,15 @@ Yes, if you don't provide the Audio Merchant plugin with a receiving PayPal addr
 6. Customer receipt and download page after payment is completed.
 
 == Changelog ==
+= 5.0.2 =
+* Deprecated redundant full quality file field.
+* Shorten the display of long URLs in admin.
+* Added option to bypass cache in the frontend player.
+* Added check database tables.
+* Added maxlength to fields to prevent overflow.
+* Small text changes.
+* Minor code cleanup and optimization.
+
 = 5.0.1 =
 * Small CSS fix.
 

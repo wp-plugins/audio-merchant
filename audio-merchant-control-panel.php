@@ -1,7 +1,7 @@
 <?php
 /**
  * @package Audio Merchant
- * @version 5.0.3
+ * @version 5.0.4
  * @author Audio Merchant <info@MyAudioMerchant.com>
  * @copyright (C) Copyright 2015 Audio Merchant, MyAudioMerchant.com. All rights reserved.
  * @license GNU/GPL http://www.gnu.org/licenses/gpl-3.0.txt
@@ -21,6 +21,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 defined('ABSPATH') or die('No direct access!');
+
+audio_merchant_db_install();
 
 $supportedImageTypes = array('jpg', 'jpeg', 'png', 'gif');
 $supportedAudioExtensions = wp_get_audio_extensions();
@@ -76,7 +78,7 @@ if(!get_option('css_frontend_default'))
 				<form id="new_audio_file_form" method="post" enctype="multipart/form-data" onsubmit="javascript: return addNewAudioFile();">
 					<fieldset>
 						<label for="audio_display_name"><?php echo __('Audio Display Name:', 'audio-merchant'); ?></label>
-						<input type="text" name="audio_display_name" id="audio_display_name" value="" maxlength="190" placeholder="<?php echo __('Example Format: Artist - Album - Song Name 90 BPM', 'audio-merchant'); ?>" class="text ui-widget-content ui-corner-all" /> <img src="<?php echo audio_merchant_make_url_protocol_less(plugins_url('images/question_mark.png', __FILE__)); ?>" width="15" height="15" align="absmiddle" border="0" alt="" title="<?php echo __('This is the name displayed to the guest in the frontend player. You can add things like album name, BPM, etc. This field is completely flexible.', 'audio-merchant'); ?>" />
+						<input type="text" name="audio_display_name" id="audio_display_name" value="" maxlength="255" placeholder="<?php echo __('Example Format: Artist - Album - Song Name 90 BPM', 'audio-merchant'); ?>" class="text ui-widget-content ui-corner-all" /> <img src="<?php echo audio_merchant_make_url_protocol_less(plugins_url('images/question_mark.png', __FILE__)); ?>" width="15" height="15" align="absmiddle" border="0" alt="" title="<?php echo __('This is the name displayed to the guest in the frontend player. You can add things like album name, BPM, etc. This field is completely flexible.', 'audio-merchant'); ?>" />
 						<br />
 						<br />
 
@@ -427,7 +429,7 @@ if(!get_option('css_frontend_default'))
 				<form id="html_widget_form" method="post" onsubmit="javascript: return audioMerchantSaveHTMLPlayer();">
 					<fieldset>
 						<label for="playlist_name"><?php echo __('Playlist Name:', 'audio-merchant'); ?></label>
-						<input type="text" name="playlist_name" id="playlist_name" value="" maxlength="190" placeholder="<?php echo __('Example Format: My Slow Jams', 'audio-merchant'); ?>" class="text ui-widget-content ui-corner-all" /> <img src="<?php echo audio_merchant_make_url_protocol_less(plugins_url('images/question_mark.png', __FILE__)); ?>" width="15" height="15" align="absmiddle" border="0" alt="" title="<?php echo __('A descriptive name for you to remember what this playlist is about. This name is used for administrative purposes only, it is never displayed to the frontend user/listener.', 'audio-merchant'); ?>" />
+						<input type="text" name="playlist_name" id="playlist_name" value="" maxlength="255" placeholder="<?php echo __('Example Format: My Slow Jams', 'audio-merchant'); ?>" class="text ui-widget-content ui-corner-all" /> <img src="<?php echo audio_merchant_make_url_protocol_less(plugins_url('images/question_mark.png', __FILE__)); ?>" width="15" height="15" align="absmiddle" border="0" alt="" title="<?php echo __('A descriptive name for you to remember what this playlist is about. This name is used for administrative purposes only, it is never displayed to the frontend user/listener.', 'audio-merchant'); ?>" />
 						<br />
 						<br />
 						
@@ -482,7 +484,7 @@ if(!get_option('css_frontend_default'))
 						<input type="radio" onchange="javascript: toggleCreateHTMLPlayerMode();" name="player_mode" id="player_mode_text_match" value="text_match" class="text2 ui-corner-all" /><label for="player_mode_text_match"><?php echo __('Display Audio Matching Text', 'audio-merchant'); ?></label> <img src="<?php echo audio_merchant_make_url_protocol_less(plugins_url('images/question_mark.png', __FILE__)); ?>" width="15" height="15" align="absmiddle" border="0" alt="" title="<?php echo __('This option will display all the tracks that match the text defined below.', 'audio-merchant'); ?>" />
 						<br />
 						<blockquote>
-							<label for="player_mode_text_value"><?php echo __('Match String:', 'audio-merchant'); ?></label> <input type="text" name="player_mode_text_value" id="player_mode_text_value" value="" size="25" maxlength="190" placeholder="<?php echo __('Artist - Album - Song Name', 'audio-merchant'); ?>" class="text2 ui-widget-content ui-corner-all" disabled="disabled" />
+							<label for="player_mode_text_value"><?php echo __('Match String:', 'audio-merchant'); ?></label> <input type="text" name="player_mode_text_value" id="player_mode_text_value" value="" size="25" maxlength="255" placeholder="<?php echo __('Artist - Album - Song Name', 'audio-merchant'); ?>" class="text2 ui-widget-content ui-corner-all" disabled="disabled" />
 						</blockquote>
 						<br />
 						<label for="player_display_order"><?php echo __('Display Order:', 'audio-merchant'); ?></label> <select name="player_display_order" id="player_display_order" class="text2 ui-corner-all">

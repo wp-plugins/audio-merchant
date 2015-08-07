@@ -11,7 +11,7 @@
  */
 /**
  * @package Audio Merchant
- * @version 5.0.2
+ * @version 5.0.3
  * @author Audio Merchant <info@MyAudioMerchant.com>
  * @copyright (C) Copyright 2015 Audio Merchant, MyAudioMerchant.com. All rights reserved.
  * @license GNU/GPL http://www.gnu.org/licenses/gpl-3.0.txt

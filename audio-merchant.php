@@ -3,7 +3,7 @@
  * Plugin Name: Audio Merchant Lite
  * Plugin URI: http://www.MyAudioMerchant.com
  * Description: Plugin that allows you to sell/showcase your audio directly to your listeners with built-in HTML5 player.
- * Version: 5.0.2
+ * Version: 5.0.3
  * Author: Audio Merchant
  * Author URI: http://www.MyAudioMerchant.com
  * Text Domain: audio-merchant
@@ -11,7 +11,7 @@
  */
 /**
  * @package Audio Merchant
- * @version 5.0.2
+ * @version 5.0.3
  * @author Audio Merchant <info@MyAudioMerchant.com>
  * @copyright (C) Copyright 2015 Audio Merchant, MyAudioMerchant.com. All rights reserved.
  * @license GNU/GPL http://www.gnu.org/licenses/gpl-3.0.txt
@@ -73,7 +73,7 @@ add_action('wp_ajax_nopriv_audio_merchant_download', 'audio_merchant_download_fr
 add_action('wp_ajax_audio_merchant_check_order_status', 'audio_merchant_check_order_status');
 add_action('wp_ajax_nopriv_audio_merchant_check_order_status', 'audio_merchant_check_order_status');
 
-$audio_merchant_db_version = '5.0.2';
+$audio_merchant_db_version = '5.0.3';
 
 function audio_merchant_db_check() 
 {
@@ -160,7 +160,7 @@ function audio_merchant_change_order_status()
 	$sql = 'UPDATE '.$wpdb->prefix.'audio_merchant_order SET order_status = %s, order_mdate = %d 
 			WHERE order_id = %s;';
 	
-	wp_send_json(array('result' => $wpdb->query($wpdb->prepare($sql, $_GET['new_status'], current_time('timestamp'), $_GET['t']))));
+	wp_send_json(array('result' => $wpdb->query($wpdb->prepare($sql, $_GET['new_status'], (int)current_time('timestamp'), $_GET['t']))));
 }
 
 function audio_merchant_get_order() 
@@ -386,7 +386,7 @@ function audio_merchant_download_free()
 		
 		if((int)audio_merchant_get_setting('temp_download_link_expiration') > 0)
 		{
-			$dateFilterSql = ' AND o.order_mdate >= '.(current_time('timestamp')-(86400*(int)audio_merchant_get_setting('temp_download_link_expiration'))).' ';
+			$dateFilterSql = ' AND o.order_mdate >= '.((int)current_time('timestamp')-(86400*(int)audio_merchant_get_setting('temp_download_link_expiration'))).' ';
 		}
 		else
 		{
@@ -902,7 +902,7 @@ function audio_merchant_save_playlist()
 					'player_filter_value' => htmlentities($filterValue, ENT_QUOTES), 
 					'player_order_field' => $orderByField, 
 					'player_order_direction' => $orderByDirection, 
-					'player_mdate' => current_time('timestamp')
+					'player_mdate' => (int)current_time('timestamp')
 				), 
 				array('player_id' => $playerId), 
 				array(
@@ -929,8 +929,8 @@ function audio_merchant_save_playlist()
 					'player_filter_value' => htmlentities($filterValue, ENT_QUOTES), 
 					'player_order_field' => $orderByField, 
 					'player_order_direction' => $orderByDirection, 
-					'player_cdate' => current_time('timestamp'), 
-					'player_mdate' => current_time('timestamp')
+					'player_cdate' => (int)current_time('timestamp'), 
+					'player_mdate' => (int)current_time('timestamp')
 				), 
 				array( 
 					'%s', 
@@ -1574,7 +1574,7 @@ function audio_merchant_add_audio_file()
 			
 			if(empty($displayName))
 			{
-				$displayName = current_time('timestamp');
+				$displayName = (int)current_time('timestamp');
 			}
 		}
 		
@@ -1594,8 +1594,8 @@ function audio_merchant_add_audio_file()
 						'audio_lease_additional_file' => $additionalFileLease,
 						'audio_exclusive_additional_file' => $additionalFileExclusive,
 						'audio_duration' => 0,
-						'audio_cdate' => current_time('timestamp'),
-						'audio_mdate' => current_time('timestamp')
+						'audio_cdate' => (int)current_time('timestamp'),
+						'audio_mdate' => (int)current_time('timestamp')
 					), 
 					array( 
 						'%s', 
@@ -1626,7 +1626,7 @@ function audio_merchant_add_audio_file()
 						'audio_lease_additional_file' => $additionalFileLease,
 						'audio_exclusive_additional_file' => $additionalFileExclusive,
 						'audio_duration' => 0,
-						'audio_mdate' => current_time('timestamp')
+						'audio_mdate' => (int)current_time('timestamp')
 					), 
 					array('audio_id' => (int)$_POST['editing_audio_id']), 
 					array( 
@@ -1752,7 +1752,7 @@ function audio_merchant_render_player($audioIds=array(), $playerId=0, $height=40
 	
 	if($playerId > 0)
 	{
-		$html = '<iframe width="100%" height="'.(string)$height.'" scrolling="no" frameborder="no" src="'.audio_merchant_make_url_protocol_less(admin_url('admin-ajax.php?action=audio_merchant_html_player'.$urlDivider.'nocache=1'.$urlDivider.'playlist_id='.(string)$playerId.$urlDivider.'height='.(string)$height.$urlDivider.'autoplay='.(string)$autoPlay.$urlDivider.'current_url='.urlencode($currentUrl))).'"></iframe>';
+		$html = '<iframe width="100%" height="'.(string)$height.'" scrolling="no" frameborder="no" src="'.audio_merchant_make_url_protocol_less(admin_url('admin-ajax.php?action=audio_merchant_html_player'.$urlDivider.'playlist_id='.(string)$playerId.$urlDivider.'height='.(string)$height.$urlDivider.'autoplay='.(string)$autoPlay.$urlDivider.'current_url='.urlencode($currentUrl))).'"></iframe>';
 	}
 	elseif(!empty($audioIds))
 	{
@@ -1761,11 +1761,11 @@ function audio_merchant_render_player($audioIds=array(), $playerId=0, $height=40
 			$audioIds = implode(',', $audioIds);
 		}
 		
-		$html = '<iframe width="100%" height="'.(string)$height.'" scrolling="no" frameborder="no" src="'.audio_merchant_make_url_protocol_less(admin_url('admin-ajax.php?action=audio_merchant_html_player'.$urlDivider.'nocache=1'.$urlDivider.'audio_id='.(string)$audioIds.$urlDivider.'height='.(string)$height.$urlDivider.'autoplay='.(string)$autoPlay.$urlDivider.'current_url='.urlencode($currentUrl))).'"></iframe>';
+		$html = '<iframe width="100%" height="'.(string)$height.'" scrolling="no" frameborder="no" src="'.audio_merchant_make_url_protocol_less(admin_url('admin-ajax.php?action=audio_merchant_html_player'.$urlDivider.'audio_id='.(string)$audioIds.$urlDivider.'height='.(string)$height.$urlDivider.'autoplay='.(string)$autoPlay.$urlDivider.'current_url='.urlencode($currentUrl))).'"></iframe>';
 	}
 	else
 	{
-		$html = '<iframe width="100%" height="'.(string)$height.'" scrolling="no" frameborder="no" src="'.audio_merchant_make_url_protocol_less(admin_url('admin-ajax.php?action=audio_merchant_html_player'.$urlDivider.'nocache=1'.$urlDivider.'audio_id='.$urlDivider.'height='.(string)$height.$urlDivider.'autoplay='.(string)$autoPlay.$urlDivider.'current_url='.urlencode($currentUrl))).'"></iframe>';
+		$html = '<iframe width="100%" height="'.(string)$height.'" scrolling="no" frameborder="no" src="'.audio_merchant_make_url_protocol_less(admin_url('admin-ajax.php?action=audio_merchant_html_player'.$urlDivider.'audio_id='.$urlDivider.'height='.(string)$height.$urlDivider.'autoplay='.(string)$autoPlay.$urlDivider.'current_url='.urlencode($currentUrl))).'"></iframe>';
 	}
 	
 	if((int)audio_merchant_get_setting('show_author_link') > 0)
